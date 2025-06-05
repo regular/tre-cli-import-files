@@ -1,18 +1,19 @@
 const fs = require('fs')
 const {join, resolve, dirname} = require('path')
 const merge = require('lodash.merge')
+
 const traverse = require('traverse')
 const debug = require('debug')('tre-cli-import-files')
 
 const pull = require('pull-stream')
 const file = require('pull-file')
 const {stdin} = require('pull-stdio')
-const {isMsg, isBlob} = require('ssb-ref')
+const {isMsg} = require('ssb-ref')
 
 const Importer = require('tre-file-importer')
 const fileFromPath = require('tre-file-importer/file')
 
-const causalOrder = require('./lib/causal-order')
+const causalOrder = require('./lib/causal-sort')
 
 module.exports = doImport
 
@@ -41,12 +42,13 @@ function doImport(ssb, conf, basedir, pkg, opts, cb) {
     importFiles(ssb, importers, pkg.files, prototypes, basedir, (err, fileMessages) => {
       if (err) return cb(err)
       const messages = Object.assign({}, fileMessages, pkg.messages || {})
+      debug('combined messages: %O', messages)
       publishMessages(ssb, basedir, branches, messages, (err, branches) => {
         if (err) return cb(err)
         const newConfig = {
           branches, prototypes
         }
-        ssb.close()
+        //ssb.close()
         cb(null, newConfig)
       })
     })

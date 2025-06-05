@@ -1,5 +1,5 @@
 const test = require('tape')
-const sort = require('../lib/causal-order')
+const sort = require('../lib/causal-sort')
 
 test('simple', t => {
   const msgs = {
